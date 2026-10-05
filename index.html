@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Arabic Body Parts Game</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6fa;
+    text-align: center;
+    color: #222;
+}
+
+header {
+    background: #fff;
+    padding: 15px 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+h1 {
+    margin: 0 0 10px;
+    font-size: 24px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+#score {
+    background: #eef3ff;
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#resetBtn {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.game {
+    width: 95%;
+    max-width: 1000px;
+    margin: 18px auto 30px;
+}
+
+.board {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 15px rgba(0,0,0,.12);
+    touch-action: none;
+    user-select: none;
+}
+
+.board img {
+    width: 100%;
+    display: block;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* TARGET BOXES */
+
+.target {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px dashed #4b8fe8;
+    background: rgba(255,255,255,.35);
+    border-radius: 6px;
+
+    font-size: clamp(13px, 2.3vw, 23px);
+    font-weight: bold;
+    direction: rtl;
+    color: #111;
+}
+
+.target.correct {
+    border: 2px solid #2e9d45;
+    background: rgba(220,255,225,.92);
+}
+
+.target.wrong {
+    animation: blinkRed .45s ease-in-out 3;
+}
+
+@keyframes blinkRed {
+    0%,100% {
+        background: rgba(255,255,255,.35);
+        border-color: #4b8fe8;
+    }
+
+    50% {
+        background: rgba(255,50,50,.7);
+        border-color: red;
+    }
+}
+
+/* TARGET POSITIONS */
+
+.head {
+    left: 43.3%;
+    top: 14.5%;
+    width: 15.8%;
+    height: 7%;
+}
+
+.eye {
+    left: 6.3%;
+    top: 20.7%;
+    width: 15%;
+    height: 6.8%;
+}
+
+.ear {
+    left: 6.3%;
+    top: 29.4%;
+    width: 15%;
+    height: 6.7%;
+}
+
+.mouth {
+    left: 6.3%;
+    top: 38.5%;
+    width: 15.5%;
+    height: 6.8%;
+}
+
+.nose {
+    left: 45.7%;
+    top: 29.3%;
+    width: 15.5%;
+    height: 6.8%;
+}
+
+.face {
+    left: 45.7%;
+    top: 38.5%;
+    width: 15.3%;
+    height: 6.8%;
+}
+
+.chest {
+    left: 43.4%;
+    top: 46.5%;
+    width: 15.3%;
+    height: 6.8%;
+}
+
+.finger {
+    left: 11.8%;
+    top: 52.8%;
+    width: 11.2%;
+    height: 6.6%;
+}
+
+.nail {
+    left: 12.3%;
+    top: 72.4%;
+    width: 13%;
+    height: 6.7%;
+}
+
+.leg {
+    left: 44.5%;
+    top: 80.5%;
+    width: 15.2%;
+    height: 6.7%;
+}
+
+.back {
+    left: 78.5%;
+    top: 45.5%;
+    width: 15.5%;
+    height: 7%;
+}
+
+.arm {
+    left: 77.1%;
+    top: 58.5%;
+    width: 16.3%;
+    height: 7.3%;
+}
+
+/* WORD BANK */
+
+.instructions {
+    margin: 20px 0 10px;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.word-bank {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.word {
+    background: #fff;
+    border: 2px solid #555;
+    border-radius: 10px;
+    padding: 10px 16px;
+
+    font-size: clamp(18px, 3vw, 25px);
+    font-weight: bold;
+    direction: rtl;
+
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,.1);
+}
+
+.word.used {
+    opacity: .35;
+    pointer-events: none;
+}
+
+.drag-ghost {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+
+    background: white;
+    border: 3px solid #333;
+    border-radius: 10px;
+
+    padding: 8px 14px;
+    font-size: 22px;
+    font-weight: bold;
+    direction: rtl;
+
+    transform: translate(-50%, -50%);
+    box-shadow: 0 5px 18px rgba(0,0,0,.25);
+}
+
+#message {
+    min-height: 30px;
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>🧩 Arabic Body Parts Game</h1>
+
+<div class="topbar">
+    <div id="score">Score: 0 / 12</div>
+    <button id="resetBtn">Reset</button>
+</div>
+
+</header>
+
+<div class="game">
+
+<div class="board">
+
+    <!-- IMAGE NAME MUST MATCH GITHUB FILE EXACTLY -->
+    <img
+        src="Arabic Body Parts Labelling Worksheet (2).png"
+        alt="Arabic Body Parts Worksheet"
+        draggable="false"
+    >
+
+    <!-- TARGETS -->
+
+    <div class="target head" data-answer="رَأْسٌ"></div>
+    <div class="target eye" data-answer="عَيْنٌ"></div>
+    <div class="target ear" data-answer="أُذُنٌ"></div>
+    <div class="target mouth" data-answer="فَمٌ"></div>
+    <div class="target nose" data-answer="أَنْفٌ"></div>
+    <div class="target face" data-answer="وَجْهٌ"></div>
+    <div class="target chest" data-answer="صَدْرٌ"></div>
+    <div class="target finger" data-answer="إِصْبَعٌ"></div>
+    <div class="target nail" data-answer="ظُفْرٌ"></div>
+    <div class="target leg" data-answer="رِجْلٌ"></div>
+    <div class="target back" data-answer="ظَهْرٌ"></div>
+    <div class="target arm" data-answer="يَدٌ"></div>
+
+</div>
+
+<div class="instructions">
+    Drag the correct Arabic word to the blank.
+</div>
+
+<div class="word-bank">
+
+    <div class="word" data-word="رَأْسٌ">رَأْسٌ</div>
+    <div class="word" data-word="وَجْهٌ">وَجْهٌ</div>
+    <div class="word" data-word="عَيْنٌ">عَيْنٌ</div>
+    <div class="word" data-word="أُذُنٌ">أُذُنٌ</div>
+    <div class="word" data-word="فَمٌ">فَمٌ</div>
+    <div class="word" data-word="أَنْفٌ">أَنْفٌ</div>
+    <div class="word" data-word="صَدْرٌ">صَدْرٌ</div>
+    <div class="word" data-word="يَدٌ">يَدٌ</div>
+    <div class="word" data-word="ظُفْرٌ">ظُفْرٌ</div>
+    <div class="word" data-word="ظَهْرٌ">ظَهْرٌ</div>
+    <div class="word" data-word="رِجْلٌ">رِجْلٌ</div>
+    <div class="word" data-word="إِصْبَعٌ">إِصْبَعٌ</div>
+
+</div>
+
+<div id="message"></div>
+
+</div>
+
+<script>
+
+const words = document.querySelectorAll(".word");
+const targets = document.querySelectorAll(".target");
+
+const scoreBox = document.getElementById("score");
+const resetBtn = document.getElementById("resetBtn");
+const message = document.getElementById("message");
+
+let score = 0;
+let activeWord = null;
+let ghost = null;
+
+/* Arabic normalization */
+function normalizeArabic(text) {
+    return text
+        .replace(/[\u064B-\u065F\u0670]/g, "")
+        .replace(/ـ/g, "")
+        .trim();
+}
+
+/* SCORE */
+function updateScore() {
+    scoreBox.textContent = "Score: " + score + " / 12";
+}
+
+/* FIND TARGET */
+function findTarget(x, y) {
+
+    let nearest = null;
+    let nearestDistance = Infinity;
+
+    targets.forEach(target => {
+
+        if (target.classList.contains("correct")) return;
+
+        const r = target.getBoundingClientRect();
+
+        const extra = 35;
+
+        const left = r.left - extra;
+        const right = r.right + extra;
+        const top = r.top - extra;
+        const bottom = r.bottom + extra;
+
+        if (
+            x >= left &&
+            x <= right &&
+            y >= top &&
+            y <= bottom
+        ) {
+
+            const cx = (r.left + r.right) / 2;
+            const cy = (r.top + r.bottom) / 2;
+
+            const distance = Math.sqrt(
+                Math.pow(x - cx, 2) +
+                Math.pow(y - cy, 2)
+            );
+
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearest = target;
+            }
+        }
+    });
+
+    return nearest;
+}
+
+/* MOVE GHOST */
+function moveGhost(x, y) {
+
+    if (!ghost) return;
+
+    ghost.style.left = x + "px";
+    ghost.style.top = y + "px";
+}
+
+/* START DRAG */
+function startDrag(e) {
+
+    if (e.button !== undefined && e.button !== 0) return;
+
+    activeWord = e.currentTarget;
+
+    ghost = document.createElement("div");
+    ghost.className = "drag-ghost";
+    ghost.textContent = activeWord.dataset.word;
+
+    document.body.appendChild(ghost);
+
+    moveGhost(e.clientX, e.clientY);
+
+    document.addEventListener("pointermove", dragMove);
+    document.addEventListener("pointerup", endDrag);
+    document.addEventListener("pointercancel", endDrag);
+
+    e.preventDefault();
+}
+
+/* DRAG */
+function dragMove(e) {
+
+    moveGhost(e.clientX, e.clientY);
+
+    e.preventDefault();
+}
+
+/* END DRAG */
+function endDrag(e) {
+
+    document.removeEventListener("pointermove", dragMove);
+    document.removeEventListener("pointerup", endDrag);
+    document.removeEventListener("pointercancel", endDrag);
+
+    if (!activeWord) return;
+
+    const target = findTarget(e.clientX, e.clientY);
+
+    if (target) {
+
+        const dragged =
+            normalizeArabic(activeWord.dataset.word);
+
+        const answer =
+            normalizeArabic(target.dataset.answer);
+
+        /* CORRECT */
+        if (dragged === answer) {
+
+            target.textContent = activeWord.dataset.word;
+
+            target.classList.add("correct");
+
+            activeWord.classList.add("used");
+
+            score++;
+
+            updateScore();
+
+            if (score === 12) {
+                message.textContent =
+                    "🎉 Excellent! All 12 answers are correct!";
+            } else {
+                message.textContent = "✅ Correct!";
+
+                setTimeout(() => {
+                    message.textContent = "";
+                }, 900);
+            }
+
+        }
+
+        /* WRONG */
+        else {
+
+            target.classList.add("wrong");
+
+            message.textContent = "❌ Try again!";
+
+            setTimeout(() => {
+                target.classList.remove("wrong");
+                message.textContent = "";
+            }, 1300);
+        }
+    }
+
+    if (ghost) {
+        ghost.remove();
+        ghost = null;
+    }
+
+    activeWord = null;
+}
+
+/* POINTER EVENTS */
+words.forEach(word => {
+    word.addEventListener("pointerdown", startDrag);
+});
+
+/* RESET */
+resetBtn.addEventListener("click", () => {
+
+    score = 0;
+
+    updateScore();
+
+    targets.forEach(target => {
+        target.textContent = "";
+        target.classList.remove("correct", "wrong");
+    });
+
+    words.forEach(word => {
+        word.classList.remove("used");
+    });
+
+    message.textContent = "";
+});
+
+updateScore();
+
+</script>
+
+</body>
+</html>
