@@ -269,6 +269,31 @@ h1 {
 
 /* FLOWER + BALLOON CELEBRATION */
 
+#celebrationOverlay{
+    position:fixed;
+    inset:0;
+    z-index:200000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,.82);
+    pointer-events:none;
+}
+
+#celebrationOverlay.show{
+    display:flex;
+}
+
+.celebration-message{
+    background:#fff;
+    border:3px solid #2e9d45;
+    border-radius:18px;
+    padding:20px 28px;
+    font-size:clamp(24px,6vw,42px);
+    font-weight:bold;
+    box-shadow:0 8px 30px rgba(0,0,0,.18);
+}
+
 .celebration-item {
     position: fixed;
     top: -70px;
@@ -311,6 +336,10 @@ h1 {
 </header>
 
 <div class="game">
+
+<div id="celebrationOverlay">
+    <div class="celebration-message">🎉 مَاشَاءَ اللهُ! أَحْسَنْتِ! 🎉</div>
+</div>
 
 <div class="board">
 
@@ -396,6 +425,12 @@ function celebrateSuccess() {
     if (celebrationShown) return;
 
     celebrationShown = true;
+
+    const overlay = document.getElementById("celebrationOverlay");
+    if (overlay) {
+        overlay.classList.add("show");
+        setTimeout(() => overlay.classList.remove("show"), 4500);
+    }
 
     const items = [
         "🌸","🌷","🌼","🌺","🌹","💮","🪻",
@@ -594,6 +629,9 @@ words.forEach(word => {
 resetBtn.addEventListener("click", () => {
 
     document.querySelectorAll(".celebration-item").forEach(item => item.remove());
+
+    const overlay = document.getElementById("celebrationOverlay");
+    if (overlay) overlay.classList.remove("show");
 
     score = 0;
     celebrationShown = false;
